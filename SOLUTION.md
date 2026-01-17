@@ -93,14 +93,14 @@ Resources used
 Collaboration NA
 
 
-7) Why WordCount’s Java Combiner can cause problems for UrlCount
+6) Why WordCount’s Java Combiner can cause problems for UrlCount
 
 
 The original Java WordCount implementation often uses a combiner to reduce shuffle traffic by doing local aggregation. This works because WordCount only performs summation and does not apply any global filtering, so partial results can be safely combined.
 In this UrlCount lab, the requirement to output only URLs with a global count greater than five makes using a combiner unsafe. A combiner only sees partial counts from individual mappers and cannot determine the final total. If the reducer logic were reused as a combiner and applied the count > 5 condition early, some URLs could be dropped even though their global count exceeds five. Therefore, the filtering must be done only in the final reducer after all counts have been aggregated.
 
 
-9) Execution time comparison: 2-node vs 4-node cluster
+7) Execution time comparison: 2-node vs 4-node cluster
 
    
 I ran the same UrlCount job twice using:
