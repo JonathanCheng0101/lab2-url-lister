@@ -1,10 +1,16 @@
 
 ![2-node cluster execution time](two_nodes.png)
 ![4-node cluster execution time](four_nodes.png)
+
+
 (Left: Two Nodes / Right:Four nodes)
 
-1) What my program does 
+1) What my program does
+
+
 This lab modifies the Hadoop WordCount into UrlCount:
+
+
 •	Input: A set of text files (HTML pages downloaded from Wiki).
 •	Goal: Extract URLs from text and count how many times each URL appears.
 •	Output requirement: Only output URLs whose total count is > 5.
@@ -15,7 +21,7 @@ Implementation summary (Hadoop Streaming / Python)
 
 
 
-2) Software needed & how to run
+3) Software needed & how to run
 •	Hadoop (provided by Dataproc)
 •	Python 3 (using Hadoop Streaming)
 After creating the Dataproc clusters with the required number of worker nodes in the specified region and assigning the appropriate IAM permissions to the master node, I connected to the cluster by SSH-ing into the Dataproc master node.
@@ -30,18 +36,18 @@ After all mapper outputs are collected, Hadoop groups together all counts that b
 (example (A,1) (A, 1) (B,1) -->(A,2) (B,1))
 The condition that filters out URLs with five or fewer occurrences is applied only after this aggregation step, because the full count of a URL is only known at that point.
 Finally, the reducer writes the filtered (url_counts > 5)results to the output directory in HDFS. 
-3) Resources used & collaboration 
+4) Resources used & collaboration 
 Resources used
 •	Hadoop Streaming examples
 •	Python re documentation
 •	GCP CloudSkillBoost Tutorial
 Collaboration NA
 
-4) Why WordCount’s Java Combiner can cause problems for UrlCount
+5) Why WordCount’s Java Combiner can cause problems for UrlCount
 The original Java WordCount implementation often uses a combiner to reduce shuffle traffic by doing local aggregation. This works because WordCount only performs summation and does not apply any global filtering, so partial results can be safely combined.
 In this UrlCount lab, the requirement to output only URLs with a global count greater than five makes using a combiner unsafe. A combiner only sees partial counts from individual mappers and cannot determine the final total. If the reducer logic were reused as a combiner and applied the count > 5 condition early, some URLs could be dropped even though their global count exceeds five. Therefore, the filtering must be done only in the final reducer after all counts have been aggregated.
 
-5) Execution time comparison: 2-node vs 4-node cluster
+6) Execution time comparison: 2-node vs 4-node cluster
 I ran the same UrlCount job twice using:
 •	Cluster A: 1 master + 2 workers
 •	Cluster B: 1 master + 4 workers
